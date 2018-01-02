@@ -1,0 +1,44 @@
+@import "mixins";
+
+@font-face {
+    // font-family: 'FFF';
+    // src: url('../font/FFF-Ultra.eot');
+    // src: url('../font/FFF-Ultra.eot?#iefix') format('embedded-opentype'),
+    //     url('../font/FFF-Ultra.woff2') format('woff2'),
+    //     url('../font/FFF-Ultra.woff') format('woff'),
+    //     url('../font/FFF-Ultra.svg#FFF-Ultra') format('svg');
+    // font-weight: 900;
+    // font-style: normal;
+}
+
+/* 
+ * Generic
+ */
+html, body
+{
+  width:100%;
+  padding:0;
+  margin:0;
+}
+body {
+  -webkit-transform: translate3d(0, 0, 0);
+}
+*{
+ box-sizing: border-box; 
+}
+svg polygon,
+svg path
+{
+  position: relative;
+  backface-visibility: hidden;
+  transform: translate3D(0, 0, 0);
+  z-index:2;
+}
+
+/* 
+ * Layout
+ */
+body
+{
+  padding:40px;
+}

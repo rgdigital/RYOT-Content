@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>RYOT Content Bootstrap</title>
+  <meta name="viewport" content="width=device-width">
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <style type="text/css">
+    body
+    {
+      background: #2b2b2b;
+      text-align:center;
+    }
+    iframe
+    {
+      margin:0 auto;
+    }
+    @media (max-width: 580px) {
+      iframe {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <iframe src="content.html" width="970" scrolling="no" border="0" style="border:0;margin-top:50px" id="ryotiframe" onload="new $ryotParent(this)"></iframe>
+
+  <script src="public/js/parent.js"></script>
+
+</body>
+</html>

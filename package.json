@@ -1,0 +1,30 @@
+{
+  "name": "fitbit_advent_calendar",
+  "version": "0.0.1",
+  "description": "Fitbit advent calendar",
+  "main": "index.js",
+  "dependencies": {
+    "svg-path-to-polygons": "^0.1.0"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.11.1",
+    "connect-modrewrite": "^0.10.2",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-html-compile": "^1.0.5",
+    "gulp-html-partial": "^1.0.1",
+    "gulp-imagemin": "^3.3.0",
+    "gulp-prettyerror": "^1.1.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^1.9.1",
+    "gulp-uglify": "^2.0.0",
+    "gulp-zip": "^4.0.0",
+    "merge-stream": "^1.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
