@@ -3,9 +3,12 @@
  */
 .ryot-inview
 {
-  @include transition(all .2s ease);
+  &.ryot-shown
+  {
+    
+  }  
   &.ryot-visible
   {
-    background:#e1e1e1;
+    
   }
 }

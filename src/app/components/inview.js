@@ -44,6 +44,9 @@ $ryot.Component.inview.prototype.areElemsInView = function() {
     var elemPos = pos.top + data.topPosition;
     var elem = elems[i];
     if (pos.top >= (visibleTop-this.threshold) && pos.bottom <= (visibleBottom+this.threshold)) {
+      if (!this.tools.hasClass(elem, "ryot-shown")) {
+        this.tools.addClass(elem, "ryot-shown");
+      }
       if (!this.tools.hasClass(elem, "ryot-visible")) {
         this.tools.addClass(elem, "ryot-visible");
       }

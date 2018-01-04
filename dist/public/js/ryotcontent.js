@@ -241,7 +241,8 @@ $ryot.Component.followscroll.prototype.getElements = function() {
 $ryot.Component.followscroll.prototype.scrolling = function() {
   var self = this;
   setInterval(function() {
-    self.elements[0].style.top = self.parent.data.childScrollTop + "px";
+    var xPosition = (self.parent.data.childScrollTop<8 ? 0 : self.parent.data.childScrollTop-8)
+    self.elements[0].style.top = xPosition + "px";
   }, this.options.checkSpeed);
 };
 $ryot.Component.inview = function() {
@@ -290,6 +291,9 @@ $ryot.Component.inview.prototype.areElemsInView = function() {
     var elemPos = pos.top + data.topPosition;
     var elem = elems[i];
     if (pos.top >= (visibleTop-this.threshold) && pos.bottom <= (visibleBottom+this.threshold)) {
+      if (!this.tools.hasClass(elem, "ryot-shown")) {
+        this.tools.addClass(elem, "ryot-shown");
+      }
       if (!this.tools.hasClass(elem, "ryot-visible")) {
         this.tools.addClass(elem, "ryot-visible");
       }

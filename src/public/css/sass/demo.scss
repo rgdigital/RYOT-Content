@@ -1,0 +1,44 @@
+@import "mixins";
+
+/* 
+ * Demo styles
+ */
+
+/* 
+ * Followscroll component
+ */
+.ryot-followscroll
+{
+  @include transition(all .1s ease);
+  position: absolute;
+  background:#e1e1e1;
+  padding:20px;
+  right:0;
+}
+
+/* 
+ * Inview component
+ */
+.ryot-inview
+{
+  @include transition(all .2s ease);
+  &.ryot-visible
+  {
+    background:#e1e1e1;
+  }
+  &.anim-fromleft
+  {
+    position: relative;
+    left:-110%;
+  }
+  &.anim-fromright
+  {
+    position: relative;
+    left:110%;
+  }
+  &.ryot-shown
+  {
+    @include transition(all 1s ease);
+    left:0;
+  }
+}
