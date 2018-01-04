@@ -22,19 +22,28 @@ var $ryotParent = function(iframe) {
 };
 
 $ryotParent.prototype = {
-  data : {},
+  data : {
+    topPosition : 0,
+    scrollTop : 0,
+    winWidth : 0,
+    winHeight : 0,
+  },
   init : function() {
+    // Get data
     this.setupScrollData();
+    this.getIframePosition();
+    // Attach resize listener
+    this.setupResize();
+    // Attach data send / recieve
     this.setupSend();
     this.setupReciever();
   },
   setupSend : function() {
     var self = this;
-    // var data = this.data;
     setInterval(function() {
       var str = JSON.stringify(self.data);
       self.iframe.contentWindow.postMessage(str.toString(), '*');
-    }, 250);
+    }, 50);
   },
   setupReciever : function() {
     var self = this;
@@ -48,11 +57,42 @@ $ryotParent.prototype = {
       self.setIframeHeight(data.docHeight);
     },false);
   },
+  setupResize : function() {
+    var self = this;
+    var winSize = self.getWindowSize();
+    self.data.winWidth = winSize.width;
+    self.data.winHeight = winSize.height;
+    window.addEventListener('resize', function(){
+      var winSize = self.getWindowSize();
+      self.data.winWidth = winSize.x;
+      self.data.winHeight = winSize.y;
+    }, true);
+  },
+  getWindowSize : function() {
+    var w = window,
+        d = document,
+        e = d.documentElement,
+        g = d.getElementsByTagName('body')[0],
+        x = w.innerWidth || e.clientWidth || g.clientWidth,
+        y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+    return {
+      width : x,
+      height : y
+    };
+  },
   setIframeHeight : function(height) {
     if (height!==this.data.height) {
-      this.data.height = height;
       this.iframe.style.height = height + "px";
     }
+  },
+  getIframePosition : function() {
+    var element = this.iframe;
+    var bodyRect = document.body.getBoundingClientRect(),
+        elemRect = element.getBoundingClientRect(),
+        top = elemRect.top - bodyRect.top;
+        // bottom = elemRect.top - bodyRect.top,
+        // console.log(bodyRect, elemRect)
+    this.data.topPosition = top;
   },
   setupScrollData : function() {
     var self = this;
@@ -67,5 +107,6 @@ $ryotParent.prototype = {
     function wheel(e) {
       self.data.scrollTop = getScrollTop();
     }
+    this.data.scrollTop = getScrollTop();
   }
 };

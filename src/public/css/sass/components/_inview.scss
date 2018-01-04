@@ -1,0 +1,11 @@
+/* 
+ * InView
+ */
+.ryot-inview
+{
+  @include transition(all .2s ease);
+  &.ryot-visible
+  {
+    background:#e1e1e1;
+  }
+}

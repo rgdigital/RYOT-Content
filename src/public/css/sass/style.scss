@@ -42,3 +42,9 @@ body
 {
   padding:40px;
 }
+
+/* 
+ * Components
+ */
+@import "components/followscroll";
+@import "components/inview";

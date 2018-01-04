@@ -16,6 +16,7 @@ var htmlPartial = require('gulp-html-partial');
 var modRewrite  = require('connect-modrewrite');
 var template    = require('gulp-html-compile');
 var rename      = require('gulp-rename');
+var order       = require("gulp-order");
 
 // Paths
 var path = {};
@@ -51,7 +52,7 @@ gulp.task('serve', [], function () {
   }
 
   gulp.watch(["src/*.html"], ['display']) .on('change', reload);
-  gulp.watch("src/public/css/sass/*.scss", ['sass']);
+  gulp.watch("src/public/css/sass/**/*.scss", ['sass']);
   gulp.watch("src/app/**/*.js", ['ryotcontent']).on('change', reload);
   gulp.watch("src/app/views/**/*.js", ['views']).on('change', reload);
   gulp.watch("src/app/parent/**/*.js", ['parent']).on('change', reload);
@@ -89,7 +90,8 @@ gulp.task('ryotcontent', function() {
   var ryot = gulp.src([
       "src/app/core/core.js",
       "src/app/core/*.js",
-      "src/app/core/run.js",
+      "src/app/components/*.js",
+      "src/app/run.js",
     ])
     .pipe(prettyError())
     // .pipe(sourcemaps.init())
