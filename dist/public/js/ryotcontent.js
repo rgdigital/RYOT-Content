@@ -75,8 +75,9 @@ $ryot.Component = $ryot.prototype.components;
  * Props
  */
 $ryot.prototype.eventBus = {};
-$ryot.prototype.data = {};
+$ryot.prototype.sendData = {};
 $ryot.prototype.parent = window.parent;
+$ryot.prototype.processedEvents = [];
 
 /*
  * Constructor / Init
@@ -86,8 +87,20 @@ $ryot.prototype.init = function() {
   this.setupSend();
   this.setupReciever();
   this.setupCore();
-  this.setupComponents();
   this.docHeight = this.getDocumentHeight();
+  this.eventBus = this.core.eventBus;
+
+  // Delay this many times
+  var delay = 5,
+      i = 0;
+  // Loop
+  var delayedInit = setInterval(function() {
+    if (i > delay) {
+      self.setupComponents();
+      clearInterval(delayedInit);
+    }
+    ++i;
+  }, this.options.checkSpeed);
 };
 
 /*
@@ -96,10 +109,21 @@ $ryot.prototype.init = function() {
 $ryot.prototype.setupSend = function() {
   var self = this;
   setInterval(function() {
-    var str = JSON.stringify(self.data);
+    var sendData = self.processSendData(self.sendData);
+    var str = JSON.stringify(sendData);
     self.parent.postMessage(str, '*');
   }, this.options.checkSpeed);
 };
+
+/*
+ * Send data to parent Iframe
+ */
+$ryot.prototype.processSendData = function(data) {
+  var newData = {};
+  newData.docHeight = this.docHeight;
+  newData.processedEvents = this.processedEvents;
+  return newData;
+}
 
 /*
  * Receive data from parent iframe
@@ -113,15 +137,20 @@ $ryot.prototype.setupReciever = function() {
   // Listen to message from child window
   eventer(messageEvent,function(e) {
     var data = JSON.parse(e.data);
-    self.data = self.processData(data);
+    self.data = self.processRecievedData(data);
+    // If there are events to be processed
+    if (data.eventQueue.length>0) {
+      // self.eventBus.processEvents();
+    }
   },false);
 };
 
 /*
  * Process data from parent
  */
-$ryot.prototype.processData = function(data) {
+$ryot.prototype.processRecievedData = function(data) {
   var newData = {};
+  newData.eventQueue = data.eventQueue;
   newData.topPosition = data.topPosition;
   newData.docHeight = this.docHeight;
   newData.winHeight = data.winHeight;
@@ -130,6 +159,30 @@ $ryot.prototype.processData = function(data) {
   newData.visibleBounds = this.getVisibleBounds(data.scrollTop, newData.childScrollTop, data.topPosition, newData.docHeight, data.winHeight);
   return newData;
 }
+
+/*
+ * Setup core
+ */
+$ryot.prototype.setupCore = function() {
+  var self = this;
+  var core = this.core;
+  for (var key in core) {
+    core[key].prototype.parent = this;
+    core[key] = new core[key]();
+  }
+};
+
+/*
+ * Setup components
+ */
+$ryot.prototype.setupComponents = function() {
+  var self = this;
+  var components = this.components;
+  for (var key in components) {
+    components[key].prototype.parent = this;
+    components[key] = new components[key]();
+  }
+};
 
 /*
  * Get visible bounds
@@ -157,30 +210,50 @@ $ryot.prototype.getDocumentHeight = function() {
   var height = Math.max( body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );
   return height;
 };
-
 /*
- * Setup core
+ * Core eventBus class
  */
-$ryot.prototype.setupCore = function() {
-  var self = this;
-  var core = this.core;
-  for (var key in core) {
-    core[key].prototype.parent = this;
-    core[key] = new core[key]();
-  }
+$ryot.Core.eventBus = function() {
+  
+  return this;
 };
 
-/*
- * Setup components
- */
-$ryot.prototype.setupComponents = function() {
-  var self = this;
-  var components = this.components;
-  for (var key in components) {
-    components[key].prototype.parent = this;
-    components[key] = new components[key]();
+$ryot.Core.eventBus.prototype = {
+  queue : {},
+  processed : {},
+  addToQueue : function(eventName, data) {
+    this.key = key;
+    this.eventName = eventName;
+    // this.data = data;
+    return {
+      key : key,
+      eventName : eventName,
+      // data : data,
+    }
+  },
+  removeFromQueue : function() {},
+  checkForProcessed : function() {},
+  processEvents : function() {
+    console.log(this)
+    var queue = this.data.eventQueue;
+    return;
+    var queue = this.data.eventQueue;
+    for (var i = 0; i < queue.length; i++) {
+      switch (queue[i]) {
+        case 'resize':
+          if (this.processedEvents.indexOf(queue[i]) == -1) {
+            this.processedEvents.push(queue[i]);
+            console.log("add", this.processedEvents[i]);
+          }
+          break;
+        default:
+          // default
+          break;
+      }
+    }
+    // console.log("child processed", this.processedEvents)
   }
-};
+}
 /*
  * Core Tools class
  */
@@ -240,10 +313,22 @@ $ryot.Component.followscroll.prototype.getElements = function() {
 
 $ryot.Component.followscroll.prototype.scrolling = function() {
   var self = this;
+  var elems = this.elements;
   setInterval(function() {
-    var xPosition = (self.parent.data.childScrollTop<8 ? 0 : self.parent.data.childScrollTop-8)
-    self.elements[0].style.top = xPosition + "px";
+    for (var i = 0; i < elems.length; i++) {
+      self.moveElem(elems[i]);
+    }
   }, this.options.checkSpeed);
+};
+
+$ryot.Component.followscroll.prototype.moveElem = function(elem) {
+  var elemHeight = elem.offsetHeight;
+  var docHeight = this.parent.data.docHeight;
+  var xPosition = (this.parent.data.childScrollTop<8 ? 0 : this.parent.data.childScrollTop-8);
+  if (xPosition > (this.parent.data.docHeight-elemHeight)-10) {
+    xPosition = this.parent.data.docHeight-elemHeight;
+  }
+  elem.style.top = xPosition + "px";
 };
 $ryot.Component.inview = function() {
   this.options = this.parent.options;

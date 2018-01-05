@@ -11,8 +11,20 @@ $ryot.Component.followscroll.prototype.getElements = function() {
 
 $ryot.Component.followscroll.prototype.scrolling = function() {
   var self = this;
+  var elems = this.elements;
   setInterval(function() {
-    var xPosition = (self.parent.data.childScrollTop<8 ? 0 : self.parent.data.childScrollTop-8)
-    self.elements[0].style.top = xPosition + "px";
+    for (var i = 0; i < elems.length; i++) {
+      self.moveElem(elems[i]);
+    }
   }, this.options.checkSpeed);
+};
+
+$ryot.Component.followscroll.prototype.moveElem = function(elem) {
+  var elemHeight = elem.offsetHeight;
+  var docHeight = this.parent.data.docHeight;
+  var xPosition = (this.parent.data.childScrollTop<8 ? 0 : this.parent.data.childScrollTop-8);
+  if (xPosition > (this.parent.data.docHeight-elemHeight)-10) {
+    xPosition = this.parent.data.docHeight-elemHeight;
+  }
+  elem.style.top = xPosition + "px";
 };

@@ -23,11 +23,13 @@ var $ryotParent = function(iframe) {
 
 $ryotParent.prototype = {
   data : {
+    eventQueue : [],
     topPosition : 0,
     scrollTop : 0,
     winWidth : 0,
     winHeight : 0,
   },
+  receivedData : {},
   init : function() {
     // Get data
     this.setupScrollData();
@@ -57,6 +59,20 @@ $ryotParent.prototype = {
       self.setIframeHeight(data.docHeight);
     },false);
   },
+  eventBus : {
+    queue : {},
+    processed : {},
+    addToQueue : function(eventName, data) {
+
+      return {
+        eventName : eventName,
+        data : data,
+        key : key
+      }
+    },
+    removeFromQueue : function() {},
+    checkForProcessedEvents : function() {},
+  },
   setupResize : function() {
     var self = this;
     var winSize = self.getWindowSize();
@@ -64,9 +80,28 @@ $ryotParent.prototype = {
     self.data.winHeight = winSize.height;
     window.addEventListener('resize', function(){
       var winSize = self.getWindowSize();
-      self.data.winWidth = winSize.x;
-      self.data.winHeight = winSize.y;
+      self.data.winWidth = winSize.width;
+      self.data.winHeight = winSize.height;
+      self.addToEventQueue('resize');
     }, true);
+  },
+  addToEventQueue : function(eventName) {
+    var eventQueue = this.data.eventQueue;
+    for (var i = 0; i < eventQueue.length; i++) {
+      if (eventQueue[i] == eventName) {
+        // If exists, don't add
+        return;
+      }
+    }
+    // Add
+    this.data.eventQueue.push(eventName);
+  },
+  checkForProcessedEvents : function(eventQueue) {
+    for (var i = 0; i < eventQueue.length; i++) {
+      if (eventQueue.indexOf(eventQueue[i]) == 0) {
+        this.data.eventQueue.splice(i, 1);
+      }
+    }
   },
   getWindowSize : function() {
     var w = window,
