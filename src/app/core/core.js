@@ -73,10 +73,8 @@ $ryot.Component = $ryot.prototype.components;
 /*
  * Props
  */
-$ryot.prototype.eventBus = {};
 $ryot.prototype.sendData = {};
 $ryot.prototype.parent = window.parent;
-$ryot.prototype.processedEvents = [];
 
 /*
  * Constructor / Init
@@ -119,8 +117,12 @@ $ryot.prototype.setupSend = function() {
  */
 $ryot.prototype.processSendData = function(data) {
   var newData = {};
+  
+  // Send the document height, used for resizing the iframe
   newData.docHeight = this.docHeight;
+  // Events sent from parent which have been processed
   newData.processedEvents = this.processedEvents;
+
   return newData;
 }
 
@@ -137,10 +139,6 @@ $ryot.prototype.setupReciever = function() {
   eventer(messageEvent,function(e) {
     var data = JSON.parse(e.data);
     self.data = self.processRecievedData(data);
-    // If there are events to be processed
-    if (data.eventQueue.length>0) {
-      // self.eventBus.processEvents();
-    }
   },false);
 };
 
@@ -149,13 +147,17 @@ $ryot.prototype.setupReciever = function() {
  */
 $ryot.prototype.processRecievedData = function(data) {
   var newData = {};
-  newData.eventQueue = data.eventQueue;
+  newData.eventsQueue = data.eventsQueue;
   newData.topPosition = data.topPosition;
   newData.docHeight = this.docHeight;
   newData.winHeight = data.winHeight;
   newData.scrollTop = data.scrollTop;
   newData.childScrollTop = (data.scrollTop-data.topPosition<0 ? 0 : data.scrollTop-data.topPosition);
   newData.visibleBounds = this.getVisibleBounds(data.scrollTop, newData.childScrollTop, data.topPosition, newData.docHeight, data.winHeight);
+
+  // Sync events queue
+  this.eventBus.getQueue(data.eventsQueue);
+
   return newData;
 }
 
@@ -182,6 +184,13 @@ $ryot.prototype.setupComponents = function() {
     components[key] = new components[key]();
   }
 };
+
+/*
+ * Add event listener
+ */
+$ryot.prototype.addEventListener = function() {
+  
+}
 
 /*
  * Get visible bounds

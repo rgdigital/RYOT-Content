@@ -18,12 +18,12 @@ window.requestAnimFrame = (function(){
  */
 var $ryotParent = function(iframe) {
   this.iframe = iframe;
+  this.eventBus = new this.eventBus(this.data);
   this.init();
 };
 
 $ryotParent.prototype = {
   data : {
-    eventQueue : [],
     topPosition : 0,
     scrollTop : 0,
     winWidth : 0,
@@ -43,7 +43,9 @@ $ryotParent.prototype = {
   setupSend : function() {
     var self = this;
     setInterval(function() {
-      var str = JSON.stringify(self.data);
+      var data = self.data;
+          data.eventsQueue = self.eventBus.queue;
+      var str = JSON.stringify(data);
       self.iframe.contentWindow.postMessage(str.toString(), '*');
     }, 50);
   },
@@ -57,21 +59,8 @@ $ryotParent.prototype = {
     eventer(messageEvent,function(e) {
       var data = JSON.parse(e.data);
       self.setIframeHeight(data.docHeight);
+      // console.log(data)
     },false);
-  },
-  eventBus : {
-    queue : {},
-    processed : {},
-    addToQueue : function(eventName, data) {
-
-      return {
-        eventName : eventName,
-        data : data,
-        key : key
-      }
-    },
-    removeFromQueue : function() {},
-    checkForProcessedEvents : function() {},
   },
   setupResize : function() {
     var self = this;
@@ -82,26 +71,8 @@ $ryotParent.prototype = {
       var winSize = self.getWindowSize();
       self.data.winWidth = winSize.width;
       self.data.winHeight = winSize.height;
-      self.addToEventQueue('resize');
+      self.eventBus.addToQueue('resize');
     }, true);
-  },
-  addToEventQueue : function(eventName) {
-    var eventQueue = this.data.eventQueue;
-    for (var i = 0; i < eventQueue.length; i++) {
-      if (eventQueue[i] == eventName) {
-        // If exists, don't add
-        return;
-      }
-    }
-    // Add
-    this.data.eventQueue.push(eventName);
-  },
-  checkForProcessedEvents : function(eventQueue) {
-    for (var i = 0; i < eventQueue.length; i++) {
-      if (eventQueue.indexOf(eventQueue[i]) == 0) {
-        this.data.eventQueue.splice(i, 1);
-      }
-    }
   },
   getWindowSize : function() {
     var w = window,
@@ -144,4 +115,36 @@ $ryotParent.prototype = {
     }
     this.data.scrollTop = getScrollTop();
   }
+};
+
+/*
+ * Events management bus
+ */
+$ryotParent.prototype.eventBus = function(data) {
+  this.parentData = data;
+}
+$ryotParent.prototype.eventBus.prototype = {
+  queue : {},
+  processed : {},
+  addToQueue : function(eventName, data) {
+    var eventQueue = this.queue;
+    var size = Object.keys(eventQueue).length;
+    for (var key in eventQueue) {
+      if (eventQueue[key] == eventName) {
+        // If exists, don't add
+        return;
+      }
+    }
+    // Add
+    this.queue[size] = eventName;
+  },
+  removeFromQueue : function() {},
+  checkForProcessedEvents : function() {
+    var eventQueue = this.queue;
+    for (var i = 0; i < eventQueue.length; i++) {
+      if (eventQueue.indexOf(eventQueue[i]) == 0) {
+        this.data.eventQueue.splice(i, 1);
+      }
+    }
+  },
 };
