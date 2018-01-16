@@ -28,6 +28,7 @@ $ryotParent.prototype = {
     scrollTop : 0,
     winWidth : 0,
     winHeight : 0,
+    docHeight : 0,
   },
   receivedData : {},
   init : function() {
@@ -45,6 +46,8 @@ $ryotParent.prototype = {
     setInterval(function() {
       var data = self.data;
           data.eventsQueue = self.eventBus.queue;
+          // data.eventsProcessed = self.eventBus.processed;
+          // console.log(data)
       var str = JSON.stringify(data);
       self.iframe.contentWindow.postMessage(str.toString(), '*');
     }, 50);
@@ -59,7 +62,8 @@ $ryotParent.prototype = {
     eventer(messageEvent,function(e) {
       var data = JSON.parse(e.data);
       self.setIframeHeight(data.docHeight);
-      // console.log(data)
+      self.data.docHeight = data.docHeight;
+      self.eventBus.checkForProcessedEvents(data.processedEvents);
     },false);
   },
   setupResize : function() {
@@ -71,6 +75,7 @@ $ryotParent.prototype = {
       var winSize = self.getWindowSize();
       self.data.winWidth = winSize.width;
       self.data.winHeight = winSize.height;
+      self.setIframeHeight(self.data.docHeight);
       self.eventBus.addToQueue('resize');
     }, true);
   },
@@ -87,7 +92,9 @@ $ryotParent.prototype = {
     };
   },
   setIframeHeight : function(height) {
-    if (height!==this.data.height) {
+    // console.log(height);
+    if (height!==this.data.docHeight) {
+      this.iframe.style.height = 0 + "px";
       this.iframe.style.height = height + "px";
     }
   },
@@ -115,36 +122,4 @@ $ryotParent.prototype = {
     }
     this.data.scrollTop = getScrollTop();
   }
-};
-
-/*
- * Events management bus
- */
-$ryotParent.prototype.eventBus = function(data) {
-  this.parentData = data;
-}
-$ryotParent.prototype.eventBus.prototype = {
-  queue : {},
-  processed : {},
-  addToQueue : function(eventName, data) {
-    var eventQueue = this.queue;
-    var size = Object.keys(eventQueue).length;
-    for (var key in eventQueue) {
-      if (eventQueue[key] == eventName) {
-        // If exists, don't add
-        return;
-      }
-    }
-    // Add
-    this.queue[size] = eventName;
-  },
-  removeFromQueue : function() {},
-  checkForProcessedEvents : function() {
-    var eventQueue = this.queue;
-    for (var i = 0; i < eventQueue.length; i++) {
-      if (eventQueue.indexOf(eventQueue[i]) == 0) {
-        this.data.eventQueue.splice(i, 1);
-      }
-    }
-  },
 };

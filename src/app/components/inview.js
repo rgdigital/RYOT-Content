@@ -1,7 +1,7 @@
 $ryot.Component.inview = function() {
   this.options = this.parent.options;
   this.elements = this.getElements();
-  this.tools = this.parent.core.tools;
+  // this.tools = this.parent.core.tools;
 
   this.threshold = 15;
 
@@ -40,7 +40,7 @@ $ryot.Component.inview.prototype.areElemsInView = function() {
   var visibleBottom = scrollTop - topMargin + winHeight;
 
   for (var i = elems.length - 1; i >= 0; i--) {
-    var pos = this.getElemPosition(elems[i]);
+    var pos = this.tools.getElemPosition(elems[i]);
     var elemPos = pos.top + data.topPosition;
     var elem = elems[i];
     if (pos.top >= (visibleTop-this.threshold) && pos.bottom <= (visibleBottom+this.threshold)) {

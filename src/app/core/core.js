@@ -81,11 +81,13 @@ $ryot.prototype.parent = window.parent;
  */
 $ryot.prototype.init = function() {
   var self = this;
+  // this.tools = new this.tools();
   this.setupSend();
   this.setupReciever();
   this.setupCore();
   this.docHeight = this.getDocumentHeight();
   this.eventBus = this.core.eventBus;
+  this.addEventListeners();
 
   // Delay this many times
   var delay = 5,
@@ -121,7 +123,7 @@ $ryot.prototype.processSendData = function(data) {
   // Send the document height, used for resizing the iframe
   newData.docHeight = this.docHeight;
   // Events sent from parent which have been processed
-  newData.processedEvents = this.processedEvents;
+  newData.processedEvents = this.eventBus.processed;
 
   return newData;
 }
@@ -147,7 +149,9 @@ $ryot.prototype.setupReciever = function() {
  */
 $ryot.prototype.processRecievedData = function(data) {
   var newData = {};
+  
   newData.eventsQueue = data.eventsQueue;
+  newData.eventsProcessed = data.eventsProcessed;
   newData.topPosition = data.topPosition;
   newData.docHeight = this.docHeight;
   newData.winHeight = data.winHeight;
@@ -156,7 +160,8 @@ $ryot.prototype.processRecievedData = function(data) {
   newData.visibleBounds = this.getVisibleBounds(data.scrollTop, newData.childScrollTop, data.topPosition, newData.docHeight, data.winHeight);
 
   // Sync events queue
-  this.eventBus.getQueue(data.eventsQueue);
+  this.eventBus.syncQueue(data.eventsQueue);
+  // console.log(data.eventsQueue);
 
   return newData;
 }
@@ -181,16 +186,10 @@ $ryot.prototype.setupComponents = function() {
   var components = this.components;
   for (var key in components) {
     components[key].prototype.parent = this;
+    components[key].prototype.tools = new this.tools();
     components[key] = new components[key]();
   }
 };
-
-/*
- * Add event listener
- */
-$ryot.prototype.addEventListener = function() {
-  
-}
 
 /*
  * Get visible bounds
@@ -213,8 +212,31 @@ $ryot.prototype.getVisibleBounds = function(scrollTop, childScrollTop, topPos, d
  * Get Doc Height for sizing
  */
 $ryot.prototype.getDocumentHeight = function() {
-  var body = document.body,
-      html = document.documentElement;
-  var height = Math.max( body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );
-  return height;
+  // var body = document.body,
+  //     html = document.documentElement;
+  // var height = Math.max( body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );
+  // console.log(height);
+  // return height;
+  return document.body.scrollHeight;
+};
+
+/*
+ * Add event listener
+ */
+$ryot.prototype.addEventListener = function(eventName, callback) {
+  // console.log(eventName, callback, this.eventBus)
+  this.eventBus.listeners[eventName] = callback;
+}
+
+/*
+ * Ready events to bus
+ */
+$ryot.prototype.addEventListeners = function() {
+  var self = this;
+  this.addEventListener('resize', function() {
+    setTimeout(function() {
+      self.docHeight = self.getDocumentHeight();
+    }, 500);
+    console.log('resize fired');
+  })
 };

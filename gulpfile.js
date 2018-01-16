@@ -121,7 +121,10 @@ gulp.task('ryotcontent', function() {
 
 // Parent
 gulp.task('parent', function() {
-  gulp.src('src/app/parent/**/*.js')
+  gulp.src([
+      'src/app/parent/parent.js',
+      'src/app/parent/**/*.js'
+    ])
     .pipe(sourcemaps.init())
     .pipe(concat('parent.js'))
     .pipe(sourcemaps.write())
@@ -141,6 +144,14 @@ gulp.task('views', function() {
     .pipe(concat('views.js'))
     .pipe(sourcemaps.write())
     .pipe(gulp.dest(path.build+'public/js/'));
+});
+
+// Copy JS Libs
+gulp.task('libs', function() {
+  gulp.src([
+      "src/app/lib/*.js"
+    ])
+  .pipe(gulp.dest(path.build+'public/js/libs/'));
 });
 
 // Copy assets
