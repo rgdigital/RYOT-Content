@@ -1,3 +1,9 @@
+// ONE Creative Ad ID
+var adId        = '000000';
+
+// ADTECH Rich Media Lib Version
+var version     = '2_63_3brandedplayer1';
+
 // Dependancies
 var gulp        = require('gulp');
 var fs          = require("fs");
@@ -17,6 +23,9 @@ var modRewrite  = require('connect-modrewrite');
 var template    = require('gulp-html-compile');
 var rename      = require('gulp-rename');
 var order       = require("gulp-order");
+var injectfile  = require("gulp-inject-file");
+var inject      = require('gulp-inject-string');
+var replace     = require('gulp-replace-path');
 
 // Paths
 var path = {};
@@ -35,13 +44,7 @@ gulp.task('serve', [], function () {
   browserSync.init({
     server: {
       baseDir: path.build,
-      // Single page app mode
-      middleware: [
-        modRewrite([
-          // '!\\.\\w+$ /index.html [L]'
-          '^([^.]+)$ /index.html [L]'
-        ])
-      ]
+      index: "parent.html",
     }
   });
 
@@ -54,6 +57,7 @@ gulp.task('serve', [], function () {
   gulp.watch(["src/*.html"], ['display']) .on('change', reload);
   gulp.watch("src/public/css/sass/**/*.scss", ['sass']);
   gulp.watch("src/app/**/*.js", ['ryotcontent']).on('change', reload);
+  gulp.watch("src/app/one/**/*.js", ['customAd']).on('change', reload);
   gulp.watch("src/app/views/**/*.js", ['views']).on('change', reload);
   gulp.watch("src/app/parent/**/*.js", ['parent']).on('change', reload);
   gulp.watch("src/public/img/**/*"+type.img, ['assets']).on('change', reload);
@@ -63,16 +67,13 @@ gulp.task('serve', [], function () {
 gulp.task('display', function() {
   // Parent
   gulp.src([
-      "src/parent.html"
-    ])
-  .pipe(rename('index.html'))
+    "src/parent.html"
+  ])
   .pipe(gulp.dest(path.build));
-  
   // Iframe
   gulp.src([
-      "src/index.html"
-    ])
-  .pipe(rename('content.html'))
+    "src/index.html"
+  ])
   .pipe(gulp.dest(path.build));
 });
 
@@ -154,12 +155,50 @@ gulp.task('libs', function() {
   .pipe(gulp.dest(path.build+'public/js/libs/'));
 });
 
+// ONE customAd
+gulp.task('customAd', function() {
+    // Live customAd
+    gulp.src('src/app/one/partials/customAd.wrapper.js')
+      .pipe(prettyError())
+      .pipe(injectfile({
+          pattern: '<!--\\s*inject:<filename>-->'
+      }))
+      .pipe(sourcemaps.init())
+      .pipe(uglify())
+      .pipe(concat('customAd.js'))
+      .pipe(sourcemaps.write())
+      .pipe(gulp.dest(path.build));
+
+    // Local customAd
+    gulp.src('src/app/one/partials/customAd.localwrapper.js')
+      .pipe(prettyError())
+      .pipe(injectfile({
+          pattern: '<!--\\s*inject:<filename>-->'
+      }))
+      .pipe(sourcemaps.init())
+      .pipe(replace('$VERSION$', version))
+      .pipe(replace('$AD_ID$', adId))
+      .pipe(uglify())
+      .pipe(concat('customAd.local.js'))
+      .pipe(sourcemaps.write())
+      .pipe(gulp.dest(path.build));
+});
+
 // Copy assets
 gulp.task('assets', function() {
   gulp.src([
       "src/public/img/**/*"+type.img
     ])
   .pipe(gulp.dest(path.build+'public/img/'));
+});
+
+gulp.task('zip', function() {
+  gulp.src([
+    'dist/**/*',
+    '!dist/parent.html',
+    ])
+    .pipe(zip('ryot_content_dist.zip'))
+    .pipe(gulp.dest('zip'))
 });
 
 // Default

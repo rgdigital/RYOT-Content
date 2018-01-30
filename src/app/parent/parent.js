@@ -92,7 +92,6 @@ $ryotParent.prototype = {
     };
   },
   setIframeHeight : function(height) {
-    // console.log(height);
     if (height!==this.data.docHeight) {
       this.iframe.style.height = 0 + "px";
       this.iframe.style.height = height + "px";

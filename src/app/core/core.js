@@ -15,6 +15,7 @@ var $ryot = function(options) {
  * DOM is ready
  */
 $ryot.ready = function(callback) {
+  var self = this;
   var baseObj = baseObj || window;
   var readyList = [];
   var readyFired = false;
@@ -23,7 +24,8 @@ $ryot.ready = function(callback) {
     if (!readyFired) {
       readyFired = true;
       for (var i = 0; i < readyList.length; i++) {
-        readyList[i].fn.call(window, readyList[i].ctx);
+        // var preload = new self.preload(readyList[i].fn.call(window, readyList[i].ctx));
+        var preload = new self.preload(readyList[i].fn);
       }
       readyList = [];
     }
@@ -59,6 +61,56 @@ $ryot.ready = function(callback) {
 };
 
 /*
+ * Preload assets
+ */
+$ryot.preload = function(callback) {
+
+  var spinner;
+  var imageAssets = document.getElementsByTagName('img');
+  var assetsStr = '';
+  var assetCount = imageAssets.length;
+  // Build cache
+  var imageCache = document.createElement('div');
+  document.body.appendChild(imageCache);
+  imageCache.style.display = 'none';
+  // Loop through and load
+  for (var i = 0; i < assetCount; i++) {
+    preloadImage(imageAssets[i].src, i, assetCount);
+    assetsStr += '<img src="'+imageAssets[i].src+'"/>';
+  }
+  imageCache.innerHTML += assetsStr;
+  addPreloaderSpinner();
+
+  function addPreloaderSpinner() {
+    spinner = document.createElement('div');
+    spinner.id = "spinner";
+    spinnerText = document.createElement('p');
+    spinnerText.innerHTML = "Loading";
+    // var iframe = window.parent.document.getElementById('ryotiframe');
+    // console.log(iframe);
+    spinner.appendChild(spinnerText);
+    document.body.appendChild(spinner);
+  };
+  // Fire preloader
+  function preloadImage(src, i, assetCount) {
+    var image = new Image();
+    image.onload = loading.bind(null, src, i, assetCount);
+    image.src = src;
+  };
+  // DOM interactions
+  function loading(src, i, assetCount, event) {
+    var amount = (assetCount/100) * i * 100;
+    if (i==assetCount-1) loadingComplete();
+  };
+  // Complete
+  function loadingComplete() {
+    spinner.style.display = "none";
+    callback();
+  };
+
+}
+
+/*
  * Core classes shorthand
  */
 $ryot.prototype.core = {};
@@ -80,8 +132,14 @@ $ryot.prototype.parent = window.parent;
  * Constructor / Init
  */
 $ryot.prototype.init = function() {
+  
   var self = this;
-  // this.tools = new this.tools();
+
+  ADTECH.addEventListener('RYOT_META', function(e) {
+    console.log(e);
+  });
+  console.log(ADTECH);
+
   this.setupSend();
   this.setupReciever();
   this.setupCore();

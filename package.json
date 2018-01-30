@@ -1,11 +1,9 @@
 {
-  "name": "fitbit_advent_calendar",
+  "name": "ryot_content_framework",
   "version": "0.0.1",
-  "description": "Fitbit advent calendar",
+  "description": "RYOT Content Framework",
   "main": "index.js",
-  "dependencies": {
-    "svg-path-to-polygons": "^0.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "browser-sync": "^2.11.1",
     "connect-modrewrite": "^0.10.2",
@@ -21,7 +19,11 @@
     "gulp-sourcemaps": "^1.9.1",
     "gulp-uglify": "^2.0.0",
     "gulp-zip": "^4.0.0",
-    "merge-stream": "^1.0.1"
+    "merge-stream": "^1.0.1",
+    "gulp-inject-file": "0.0.18",
+    "gulp-inject-string": "^1.1.0",
+    "gulp-replace": "^0.5.4",
+    "gulp-replace-path": "^0.4.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
