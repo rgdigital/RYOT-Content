@@ -21,7 +21,6 @@ $ryot.Component.followscroll.prototype.scrolling = function() {
 
 $ryot.Component.followscroll.prototype.moveElem = function(elem) {
   var elemHeight = elem.offsetHeight;
-  console.log(this.parent)
   var docHeight = this.parent.data.docHeight;
   var xPosition = (this.parent.data.childScrollTop<8 ? 0 : this.parent.data.childScrollTop-8);
   if (xPosition > (this.parent.data.docHeight-elemHeight)-10) {

@@ -2,7 +2,6 @@ $ryot.Component.inview = function() {
   this.options = this.parent.options;
   this.elements = this.getElements();
   // this.tools = this.parent.core.tools;
-
   this.threshold = 15;
 
   this.scrolling();
@@ -35,7 +34,6 @@ $ryot.Component.inview.prototype.areElemsInView = function() {
   var topMargin = data.topPosition;
   var winHeight = data.winHeight;
   var docHeight = data.docHeight;
-
   var visibleTop = (scrollTop - topMargin < 0 ? 0 : scrollTop - topMargin);
   var visibleBottom = scrollTop - topMargin + winHeight;
 

@@ -2,7 +2,7 @@
 var adId        = '000000';
 
 // ADTECH Rich Media Lib Version
-var version     = '2_63_3brandedplayer1';
+var version     = '2_65_0';
 
 // Dependancies
 var gulp        = require('gulp');

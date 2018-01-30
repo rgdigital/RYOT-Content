@@ -17,12 +17,12 @@ customAd.prototype.elem.targetWindow = targetWindow;
  */
 customAd.prototype.declareEvents = function(advert) {
   
-  // Adtech events
-  ADTECH.event('RYOT_META');
+  // Parent events
+  ADTECH.event('RYOT_PARENT_META');
   ADTECH.event('RYOT_RESIZE');
 
-  // Adtech methods 
-  ADTECH.event('FIRE_RYOT_RESIZE');
+  // Child events
+  ADTECH.event('RYOT_CHILD_META');
 
 };
 
@@ -41,44 +41,118 @@ customAd.prototype.preInit = function() {
 customAd.prototype.init = function(advert) {
   
   var self = this;
+
+  // ADTECH advert data object
   this.advert = advert;
 
+  // Elements
   this.elem.adContainer = advert.assetContainers.main.anchorDiv;
   this.elem.adContent = advert.assetContainers.main.anchorDiv.firstChild;
-  this.elem.adIframe = this.elem.adContent.firstChild;
+  this.elem.adIframe = this.elem.adContent.getElementsByTagName('iframe')[0];
   this.elem.adBody = document || this.elem.adIframe.contentWindow.document;
 
-  this.data = {};
-  this.data.utils = targetWindow.com.adtech.Utils_$VERSION$;
-  this.data.globalEventBus = targetWindow.adtechAdManager_$VERSION$.globalEventBus;
-  this.data.richMediaEvent = targetWindow.com.adtech.RichMediaEvent_$VERSION$;
+  // ADTECH libraries
+  this.lib = {};
+  this.lib.utils = targetWindow.com.adtech.Utils_$VERSION$;
+  this.lib.globalEventBus = targetWindow.adtechAdManager_$VERSION$.globalEventBus;
+  this.lib.richMediaEvent = targetWindow.com.adtech.RichMediaEvent_$VERSION$;
 
   // Meta data to pass to child
   this.metaData = {};
 
-  // Get data
-  this.setupScrollData();
-  // this.getIframePosition();
+  // Setup reciever
+  this.recieveMeta();  
+};
 
+/**
+ * Parent data object
+ */
+customAd.prototype.data = {
+  topPosition : 0,
+  scrollTop : 0,
+  winWidth : 0,
+  winHeight : 0,
+  docHeight : 0
+}
+
+/**
+ * Child data
+ */
+// customAd.prototype.childData = {}
+
+/**
+ * Fire this stuff when ready (child meta is recieved)
+ */
+customAd.prototype.whenReady = function() {
+  this.handleParentData();
+};
+
+/**
+ * Handle Parent data
+ */
+customAd.prototype.handleParentData = function() {
+  
+  // Scroll position
+  this.setupScrollData();
+  // Get Ad wrapper position data
+  this.getAdWrapperPosition();
+  // Set advert wrapper height
+  this.setAdHeight();
+  // Setup resize event
+  this.setupResize();
+
+  // Setup dispatcher
+  this.sendMeta();
+}
+
+/**
+ * Dispatch event to child
+ */
+customAd.prototype.dispatchEvent = function(eventName, data) {
+  var richMediaEvent = new this.lib.richMediaEvent(eventName);
+  var data = data || {};
+  richMediaEvent.meta = data;
+  this.advert.eventBus.dispatchEvent(richMediaEvent);
+}
+
+/**
+ * Send meta data to child (advert)
+ */
+customAd.prototype.sendMeta = function() {
+  var self = this;
   setInterval(function() {
-    var richMediaEvent = new self.data.richMediaEvent('RYOT_META');
-    richMediaEvent.meta = {
-      "metaData" : self.metaData
-    };
-    self.advert.eventBus.dispatchEvent(richMediaEvent);
+    self.dispatchEvent('RYOT_PARENT_META', self.data);
   }, 100);
 };
 
-customAd.prototype.getIframePosition = function() {
-  var element = this.elem.iframe;
-  var bodyRect = this.elem.adBody.getBoundingClientRect(),
-      elemRect = element.getBoundingClientRect(),
-      top = elemRect.top - bodyRect.top;
-      // bottom = elemRect.top - bodyRect.top,
-      // console.log(bodyRect, elemRect)
-  this.metaData.topPosition = top;
+/**
+ * Recieve meta data from child
+ */
+customAd.prototype.recieveMeta = function() {
+  var self = this;
+  this.advert.eventBus.addEventListener('RYOT_CHILD_META', function(e) {
+    self.data.docHeight = e.meta.docHeight;
+    // Set advert wrapper height
+    self.setAdHeight(e.meta.docHeight);
+    // Meta is ready, so fire
+    self.whenReady();
+  });
 };
 
+/**
+ * 
+ */
+customAd.prototype.getAdWrapperPosition = function() {
+  var element = this.elem.adContainer;
+  var bodyRect = document.body.getBoundingClientRect(),
+      elemRect = element.getBoundingClientRect(),
+      top = elemRect.top - bodyRect.top;
+  this.data.topPosition = top;
+},
+
+/**
+ * 
+ */
 customAd.prototype.setupScrollData = function() {
   var self = this;
   window.addEventListener( 'scroll', wheel, false );
@@ -90,7 +164,63 @@ customAd.prototype.setupScrollData = function() {
   var lastOffset = getScrollTop();
   var lastDate = new Date().getTime();
   function wheel(e) {
-    self.metaData.scrollTop = getScrollTop();
+    self.data.scrollTop = getScrollTop();
   }
-  this.metaData.scrollTop = getScrollTop();
+  this.data.scrollTop = getScrollTop();
+}
+
+customAd.prototype.setupResize = function() {
+  var self = this;
+  var winSize = self.getWindowSize();
+  self.data.winWidth = winSize.width;
+  self.data.winHeight = winSize.height;
+  window.addEventListener('resize', function(){
+    var winSize = self.getWindowSize();
+    self.data.winWidth = winSize.width;
+    self.data.winHeight = winSize.height;
+    self.setIframeHeight(self.data.docHeight);
+    // self.eventBus.addToQueue('resize');
+  }, true);
 };
+
+customAd.prototype.getWindowSize = function() {
+  var w = window,
+      d = document,
+      e = d.documentElement,
+      g = d.getElementsByTagName('body')[0],
+      x = w.innerWidth || e.clientWidth || g.clientWidth,
+      y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+  return {
+    width : x,
+    height : y
+  };
+};
+
+customAd.prototype.setAdHeight = function(height) {
+
+  var topWrapper = this.elem.adContainer;
+  var contentWrapper = this.elem.adContent;
+  var iframe = contentWrapper.firstChild;
+  var docBody = this.elem.docBody;
+
+  // Top wrapper
+  topWrapper.style.width = "auto";
+  topWrapper.style.height = "auto";
+
+  // Style
+  contentWrapper.style.clip = "";
+
+  if (height!==this.data.docHeight) {
+
+    height = this.data.docHeight;
+
+    // topWrapper.style.height = 0 + "px";
+    topWrapper.style.height = height + "px";
+    // 
+    // contentWrapper.style.height = 0 + "px";
+    contentWrapper.style.height = height + "px";
+    // 
+    // iframe.style.height = 0 + "px";
+    iframe.style.height = height + "px";
+  }
+},
