@@ -84,14 +84,16 @@ customAd.prototype.data = {
  * Fire this stuff when ready (child meta is recieved)
  */
 customAd.prototype.whenReady = function() {
+  // Process data from parent
   this.handleParentData();
+  // Setup dispatcher
+  this.sendMeta();
 };
 
 /**
  * Handle Parent data
  */
 customAd.prototype.handleParentData = function() {
-  
   // Scroll position
   this.setupScrollData();
   // Get Ad wrapper position data
@@ -100,9 +102,6 @@ customAd.prototype.handleParentData = function() {
   this.setAdHeight();
   // Setup resize event
   this.setupResize();
-
-  // Setup dispatcher
-  this.sendMeta();
 }
 
 /**
@@ -178,8 +177,9 @@ customAd.prototype.setupResize = function() {
     var winSize = self.getWindowSize();
     self.data.winWidth = winSize.width;
     self.data.winHeight = winSize.height;
-    self.setIframeHeight(self.data.docHeight);
+    self.setAdHeight(self.data.docHeight);
     // self.eventBus.addToQueue('resize');
+    console.log("resize");
   }, true);
 };
 
@@ -209,6 +209,9 @@ customAd.prototype.setAdHeight = function(height) {
 
   // Style
   contentWrapper.style.clip = "";
+  topWrapper.style.position = "absolute";
+  topWrapper.style.left = 0;
+  topWrapper.style.top = 0;
 
   if (height!==this.data.docHeight) {
 
