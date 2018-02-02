@@ -153,6 +153,7 @@ $ryot.prototype.init = function() {
     ++i;
   }, this.options.checkSpeed);
 };
+
 /*
  * 
  */

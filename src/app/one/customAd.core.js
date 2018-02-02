@@ -20,9 +20,11 @@ customAd.prototype.declareEvents = function(advert) {
   // Parent events
   ADTECH.event('RYOT_PARENT_META');
   ADTECH.event('RYOT_RESIZE');
+  ADTECH.event('RYOT_FILLWIDTH');
 
   // Child events
   ADTECH.event('RYOT_CHILD_META');
+  ADTECH.event('RYOT_CHILD_RESIZE');
 
 };
 
@@ -73,7 +75,7 @@ customAd.prototype.data = {
   winWidth : 0,
   winHeight : 0,
   docHeight : 0
-}
+};
 
 /**
  * Child data
@@ -102,7 +104,7 @@ customAd.prototype.handleParentData = function() {
   this.setAdHeight();
   // Setup resize event
   this.setupResize();
-}
+};
 
 /**
  * Dispatch event to child
@@ -112,7 +114,7 @@ customAd.prototype.dispatchEvent = function(eventName, data) {
   var data = data || {};
   richMediaEvent.meta = data;
   this.advert.eventBus.dispatchEvent(richMediaEvent);
-}
+};
 
 /**
  * Send meta data to child (advert)
@@ -129,12 +131,18 @@ customAd.prototype.sendMeta = function() {
  */
 customAd.prototype.recieveMeta = function() {
   var self = this;
+  // Meta data
   this.advert.eventBus.addEventListener('RYOT_CHILD_META', function(e) {
     self.data.docHeight = e.meta.docHeight;
     // Set advert wrapper height
-    self.setAdHeight(e.meta.docHeight);
+    self.setAdHeight(e.meta.docHeight, true);
     // Meta is ready, so fire
     self.whenReady();
+  });
+  // Check if wrapper should fill container
+  this.advert.eventBus.addEventListener('RYOT_FILLWIDTH', function(e) {
+    self.setAdToFillContainer();
+    self.setAdHeight(self.data.docHeight);
   });
 };
 
@@ -174,13 +182,15 @@ customAd.prototype.setupResize = function() {
   self.data.winWidth = winSize.width;
   self.data.winHeight = winSize.height;
   window.addEventListener('resize', function(){
+    self.dispatchEvent('RYOT_RESIZE', self.data);
+  }, true);
+  // Recieve data
+  this.advert.eventBus.addEventListener('RYOT_CHILD_RESIZE', function(e) {
     var winSize = self.getWindowSize();
     self.data.winWidth = winSize.width;
     self.data.winHeight = winSize.height;
-    self.setAdHeight(self.data.docHeight);
-    // self.eventBus.addToQueue('resize');
-    console.log("resize");
-  }, true);
+    self.setAdHeight(e.meta.docHeight);
+  });
 };
 
 customAd.prototype.getWindowSize = function() {
@@ -196,15 +206,16 @@ customAd.prototype.getWindowSize = function() {
   };
 };
 
-customAd.prototype.setAdHeight = function(height) {
-
+customAd.prototype.setAdHeight = function(height, force) {
+  // console.log(height, this.data.docHeight)
+  if (typeof height == 'undefined') return;
   var topWrapper = this.elem.adContainer;
   var contentWrapper = this.elem.adContent;
   var iframe = contentWrapper.firstChild;
   var docBody = this.elem.docBody;
 
   // Top wrapper
-  topWrapper.style.width = "auto";
+  // topWrapper.style.width = "auto";
   topWrapper.style.height = "auto";
 
   // Style
@@ -213,9 +224,10 @@ customAd.prototype.setAdHeight = function(height) {
   topWrapper.style.left = 0;
   topWrapper.style.top = 0;
 
-  if (height!==this.data.docHeight) {
+  if (height!==this.data.docHeight || force==true) {
 
-    height = this.data.docHeight;
+    // this.data.docHeight = height;
+    // height = this.data.docHeight;
 
     // topWrapper.style.height = 0 + "px";
     topWrapper.style.height = height + "px";
@@ -225,5 +237,22 @@ customAd.prototype.setAdHeight = function(height) {
     // 
     // iframe.style.height = 0 + "px";
     iframe.style.height = height + "px";
+
+    // Finalise
+    this.data.docHeight = height;
   }
-},
+};
+
+customAd.prototype.setAdToFillContainer = function() {
+  
+  var topWrapper = this.elem.adContainer;
+  var contentWrapper = this.elem.adContent;
+  var iframe = contentWrapper.firstChild;
+  var docBody = this.elem.docBody;
+
+  topWrapper.style.width = "100%";
+  contentWrapper.style.width = "100%";
+  iframe.style.width = "100%";
+  iframe.width = "100%";
+
+};
