@@ -26,6 +26,8 @@ var order       = require("gulp-order");
 var injectfile  = require("gulp-inject-file");
 var inject      = require('gulp-inject-string');
 var replace     = require('gulp-replace-path');
+var inject      = require('gulp-inject');
+var inlinesrc   = require('gulp-inline-source');
 
 // Paths
 var path = {};
@@ -122,14 +124,9 @@ gulp.task('ryotcontent', function() {
 
 // Parent
 gulp.task('parent', function() {
-  gulp.src([
-      'src/app/parent/parent.js',
-      'src/app/parent/**/*.js'
-    ])
-    .pipe(sourcemaps.init())
-    .pipe(concat('parent.js'))
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest(path.build+'public/js/'));
+    return gulp.src('src/parent.html')
+        .pipe(inlinesrc())
+        .pipe(gulp.dest(path.build));
 });
 
 // Views

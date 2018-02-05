@@ -12,18 +12,20 @@
     "gulp-html-compile": "^1.0.5",
     "gulp-html-partial": "^1.0.1",
     "gulp-imagemin": "^3.3.0",
+    "gulp-inject": "^4.3.0",
+    "gulp-inject-file": "0.0.18",
+    "gulp-inject-string": "^1.1.0",
+    "gulp-inline-source": "^3.1.0",
     "gulp-order": "^1.1.1",
     "gulp-prettyerror": "^1.1.1",
     "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
+    "gulp-replace-path": "^0.4.0",
     "gulp-sass": "^2.3.2",
     "gulp-sourcemaps": "^1.9.1",
     "gulp-uglify": "^2.0.0",
     "gulp-zip": "^4.0.0",
-    "merge-stream": "^1.0.1",
-    "gulp-inject-file": "0.0.18",
-    "gulp-inject-string": "^1.1.0",
-    "gulp-replace": "^0.5.4",
-    "gulp-replace-path": "^0.4.0"
+    "merge-stream": "^1.0.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
