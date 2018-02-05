@@ -18,7 +18,7 @@ window.requestAnimFrame = (function(){
  */
 var $ryotParent = function(iframe) {
   this.iframe = iframe;
-  this.eventBus = new this.eventBus(this.data);
+  this.eventBus = new this.eventBus(this.data, iframe);
   this.init();
 };
 
@@ -102,8 +102,6 @@ $ryotParent.prototype = {
     var bodyRect = document.body.getBoundingClientRect(),
         elemRect = element.getBoundingClientRect(),
         top = elemRect.top - bodyRect.top;
-        // bottom = elemRect.top - bodyRect.top,
-        // console.log(bodyRect, elemRect)
     this.data.topPosition = top;
   },
   setupScrollData : function() {

@@ -207,7 +207,7 @@ customAd.prototype.getWindowSize = function() {
 };
 
 customAd.prototype.setAdHeight = function(height, force) {
-  // console.log(height, this.data.docHeight)
+  
   if (typeof height == 'undefined') return;
   var topWrapper = this.elem.adContainer;
   var contentWrapper = this.elem.adContent;
@@ -254,5 +254,4 @@ customAd.prototype.setAdToFillContainer = function() {
   contentWrapper.style.width = "100%";
   iframe.style.width = "100%";
   iframe.width = "100%";
-
 };

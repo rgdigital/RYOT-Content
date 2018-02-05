@@ -1,8 +1,14 @@
 /*
  * Events management bus
  */
-$ryotParent.prototype.eventBus = function(data) {
+$ryotParent.prototype.eventBus = function(data, parentIframe) {
   this.parentData = data;
+  this.iframe = parentIframe;
+  this.ADTECH = this.iframe.contentWindow.ADTECH;
+  console.log(this.ADTECH);
+  // console.log(this.ADTECH.mraid.addEventListener);
+  // console.log(this.ADTECH);
+  // console.log(this.ADTECH.eventTypes);
 }
 $ryotParent.prototype.eventBus.prototype = {
   queue : {},
@@ -29,7 +35,6 @@ $ryotParent.prototype.eventBus.prototype = {
         delete queue[exists];
       }
     }
-    // console.log(queue, processed)
   },
   findInQueue : function(eventName) {
     for (var key in this.queue) {
