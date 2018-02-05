@@ -464,7 +464,6 @@ $ryot.Component.inview.prototype.areElemsInView = function() {
   var docHeight = data.docHeight;
   var visibleTop = (scrollTop - topMargin < 0 ? 0 : scrollTop - topMargin);
   var visibleBottom = scrollTop - topMargin + winHeight;
-
   for (var i = elems.length - 1; i >= 0; i--) {
     var pos = this.tools.getElemPosition(elems[i]);
     var elemPos = pos.top + data.topPosition;
@@ -676,10 +675,11 @@ $ryot.Component.snowBackground.prototype = {
     render();
   }
 }
+var $app;
 $ryot.ready(function() {
   var options = {
     // Speed in ticks between data checks
     checkSpeed : 50
   };
-  var app = new $ryot(options);
+  $app = new $ryot(options);
 })

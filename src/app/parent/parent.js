@@ -1,83 +1,96 @@
 "use strict";
-// requestAnimationFrame Polyfill
-window.requestAnimFrame = (function(){
-  return  window.requestAnimationFrame       ||
-          window.webkitRequestAnimationFrame ||
-          window.mozRequestAnimationFrame    ||
-          function( callback ){
-            window.setTimeout(callback, 1000 / 60);
-          };
-})();
-
 /*
  * RYOT Content Bootstrap PARENT
  */
 
-/*
- * Constructor
- */
+// Constructor
 var $ryotParent = function(iframe) {
   this.iframe = iframe;
-  this.eventBus = new this.eventBus(this.data, iframe);
   this.init();
 };
 
+// Proto
 $ryotParent.prototype = {
   data : {
     topPosition : 0,
     scrollTop : 0,
     winWidth : 0,
     winHeight : 0,
-    docHeight : 0,
+    docHeight : 0
   },
-  receivedData : {},
   init : function() {
-    // Get data
-    this.setupScrollData();
-    this.getIframePosition();
-    // Attach resize listener
-    this.setupResize();
-    // Attach data send / recieve
-    this.setupSend();
-    this.setupReciever();
+    this.childWindow = this.iframe.contentWindow;
+    this.options = this.getOptions();
+    this.childModifiers();
   },
-  setupSend : function() {
-    var self = this;
-    setInterval(function() {
-      var data = self.data;
-          data.eventsQueue = self.eventBus.queue;
-          // data.eventsProcessed = self.eventBus.processed;
-          // console.log(data)
-      var str = JSON.stringify(data);
-      self.iframe.contentWindow.postMessage(str.toString(), '*');
-    }, 50);
+  getOptions : function() {
+    var body = this.childWindow.document.body;
+    var options = {};
+    options.resizeOption = body.getAttribute('data-ryot-resize') == "true" ? true : false;
+    options.fillWidthOption = body.getAttribute('data-ryot-fillwidth') == "true" ? true : false;
+    return options;
   },
-  setupReciever : function() {
-    var self = this;
-    // Create IE + others compatible event handler
-    var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
-    var eventer = window[eventMethod];
-    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
-    // Listen to message from child window
-    eventer(messageEvent,function(e) {
-      var data = JSON.parse(e.data);
-      self.setIframeHeight(data.docHeight);
-      self.data.docHeight = data.docHeight;
-      self.eventBus.checkForProcessedEvents(data.processedEvents);
-    },false);
+  childModifiers : function() {
+    var $app = this.childWindow.$app;
+    // Get iframe height from child document
+    var height = this.getDocHeight();
+    // Set iframe height
+    this.setAdHeight(height);
+
+    // Get position of iframe from top of viewport
+    this.getIframeTopPosition();
+
+    // Scroll action
+    this.scrollAction();
+
+    // Resize event handler
+    this.resizeHandler();
+
+    // Window size
+    var winSize = this.getWindowSize();
+    $app.data.winWidth = winSize.width;
+    $app.data.winHeight = winSize.height;
+
+    // Attach resize event to iframe?
+    if (this.options.resizeOption) {
+      
+    }
+    // Make iframe stretch to fill parent
+    if (this.options.fillWidthOption) {
+      console.log("fill width switch ON");
+    }
   },
-  setupResize : function() {
-    var self = this;
-    var winSize = self.getWindowSize();
-    self.data.winWidth = winSize.width;
-    self.data.winHeight = winSize.height;
-    window.addEventListener('resize', function(){
-      var winSize = self.getWindowSize();
-      self.data.winWidth = winSize.width;
-      self.data.winHeight = winSize.height;
-      self.setIframeHeight(self.data.docHeight);
-      self.eventBus.addToQueue('resize');
-    }, true);
+  getDocHeight : function() {
+    return this.childWindow.document.body.scrollHeight;
+  },
+  setAdHeight : function(height, force) {
+    if (typeof height == 'undefined') return;
+    this.iframe.style.height = height + "px";
+  },
+  getIframeTopPosition : function() {
+    var $app = this.childWindow.$app;
+    var bodyRect = document.body.getBoundingClientRect(),
+        elemRect = this.iframe.getBoundingClientRect(),
+        top = elemRect.top - bodyRect.top;
+    $app.data.topPosition = top;
+  },
+  scrollAction : function() {
+    var $app = this.childWindow.$app;
+    var data = this.data;
+    window.addEventListener('scroll', wheel, false );
+    function getScrollTop() {
+      var doc = document.documentElement;
+      var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+      return top;
+    }
+    var lastOffset = getScrollTop();
+    var lastDate = new Date().getTime();
+    function wheel(e) {
+      $app.data.scrollTop = getScrollTop();
+      $app.data.childScrollTop = ($app.data.scrollTop-$app.data.topPosition<0 ? 0 : $app.data.scrollTop-$app.data.topPosition);
+    }
+    $app.data.scrollTop = getScrollTop();
+    $app.data.childScrollTop = ($app.data.scrollTop-$app.data.topPosition<0 ? 0 : $app.data.scrollTop-$app.data.topPosition);
   },
   getWindowSize : function() {
     var w = window,
@@ -91,32 +104,13 @@ $ryotParent.prototype = {
       height : y
     };
   },
-  setIframeHeight : function(height) {
-    if (height!==this.data.docHeight) {
-      this.iframe.style.height = 0 + "px";
-      this.iframe.style.height = height + "px";
-    }
-  },
-  getIframePosition : function() {
-    var element = this.iframe;
-    var bodyRect = document.body.getBoundingClientRect(),
-        elemRect = element.getBoundingClientRect(),
-        top = elemRect.top - bodyRect.top;
-    this.data.topPosition = top;
-  },
-  setupScrollData : function() {
+  resizeHandler : function() {
     var self = this;
-    window.addEventListener( 'scroll', wheel, false );
-    function getScrollTop() {
-      var doc = document.documentElement;
-      var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
-      return top;
-    }
-    var lastOffset = getScrollTop();
-    var lastDate = new Date().getTime();
-    function wheel(e) {
-      self.data.scrollTop = getScrollTop();
-    }
-    this.data.scrollTop = getScrollTop();
+    window.addEventListener("resize", function() {
+      // Get iframe height from child document
+      var height = self.getDocHeight();
+      // Set iframe height
+      self.setAdHeight(height);
+    })
   }
 };

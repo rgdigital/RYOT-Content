@@ -162,7 +162,7 @@ customAd.prototype.getAdWrapperPosition = function() {
  */
 customAd.prototype.setupScrollData = function() {
   var self = this;
-  window.addEventListener( 'scroll', wheel, false );
+  window.addEventListener('scroll', wheel, false );
   function getScrollTop() {
     var doc = document.documentElement;
     var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);

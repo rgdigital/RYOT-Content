@@ -36,7 +36,6 @@ $ryot.Component.inview.prototype.areElemsInView = function() {
   var docHeight = data.docHeight;
   var visibleTop = (scrollTop - topMargin < 0 ? 0 : scrollTop - topMargin);
   var visibleBottom = scrollTop - topMargin + winHeight;
-
   for (var i = elems.length - 1; i >= 0; i--) {
     var pos = this.tools.getElemPosition(elems[i]);
     var elemPos = pos.top + data.topPosition;

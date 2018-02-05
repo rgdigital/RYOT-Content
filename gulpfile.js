@@ -56,22 +56,20 @@ gulp.task('serve', [], function () {
     }, 200) 
   }
 
-  gulp.watch(["src/*.html"], ['display']) .on('change', reload);
+  gulp.watch(["src/*.html", "src/app/parent/**/*.js"], ['display']) .on('change', reload);
   gulp.watch("src/public/css/sass/**/*.scss", ['sass']);
   gulp.watch("src/app/**/*.js", ['ryotcontent']).on('change', reload);
   gulp.watch("src/app/one/**/*.js", ['customAd']).on('change', reload);
   gulp.watch("src/app/views/**/*.js", ['views']).on('change', reload);
-  gulp.watch("src/app/parent/**/*.js", ['parent']).on('change', reload);
   gulp.watch("src/public/img/**/*"+type.img, ['assets']).on('change', reload);
 });
 
 // HTML display files
 gulp.task('display', function() {
   // Parent
-  gulp.src([
-    "src/parent.html"
-  ])
-  .pipe(gulp.dest(path.build));
+  gulp.src('src/parent.html')
+          .pipe(inlinesrc())
+          .pipe(gulp.dest(path.build));
   // Iframe
   gulp.src([
     "src/index.html"
@@ -120,13 +118,6 @@ gulp.task('ryotcontent', function() {
   merge(views, ryot)
     .pipe(concat('ryotcontent.js'))
     .pipe(gulp.dest(path.build+'public/js/'));
-});
-
-// Parent
-gulp.task('parent', function() {
-    return gulp.src('src/parent.html')
-        .pipe(inlinesrc())
-        .pipe(gulp.dest(path.build));
 });
 
 // Views
