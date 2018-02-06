@@ -254,4 +254,7 @@ customAd.prototype.setAdToFillContainer = function() {
   contentWrapper.style.width = "100%";
   iframe.style.width = "100%";
   iframe.width = "100%";
+
+  // Set advert wrapper height
+  this.setAdHeight();
 };

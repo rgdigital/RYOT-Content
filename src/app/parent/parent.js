@@ -93,13 +93,13 @@ $ryotParent.prototype = {
     var lastOffset = getScrollTop();
     var lastDate = new Date().getTime();
     function wheel(e) {
-      setData()
+      setData();
     }
     function setData() {
       $app.data.scrollTop = getScrollTop();
       $app.data.childScrollTop = ($app.data.scrollTop-$app.data.topPosition<0 ? 0 : $app.data.scrollTop-$app.data.topPosition);      
     }
-    setData()
+    setData();
   },
   getWindowSize : function() {
     var w = window,
