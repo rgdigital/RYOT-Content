@@ -18,15 +18,23 @@
       margin:0 auto;
     }
     @media (max-width: 580px) {
-      iframe {
+      .wrapper
+      {
         max-width: 100%;
       }
+    }
+    .wrapper
+    {
+      width:970px;
+      margin:0 auto;
     }
   </style>
 </head>
 <body>
   
-  <iframe src="index.html" width="970" scrolling="no" border="0" style="border:0;margin:250px 0 1000px 0;" id="ryotiframe" onload="new $ryotParent(this)"></iframe>
+  <div class="wrapper">
+    <iframe src="index.html" width="970" scrolling="no" border="0" style="border:0;margin:250px 0 1000px 0;" id="ryotiframe" onload="new $ryotParent(this)"></iframe>
+  </div>
 
   <!-- 
     Parent helper, used in local preview in place of ADTECH methods.

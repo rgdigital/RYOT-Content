@@ -31,6 +31,8 @@ $ryotParent.prototype = {
     return options;
   },
   childModifiers : function() {
+    var self = this;
+    // Child ryot app
     var $app = this.childWindow.$app;
     // Get iframe height from child document
     var height = this.getDocHeight();
@@ -53,11 +55,16 @@ $ryotParent.prototype = {
 
     // Attach resize event to iframe?
     if (this.options.resizeOption) {
-      
+      window.addEventListener("resize", function() {
+        // Get iframe height from child document
+        var height = self.getDocHeight();
+        // Set iframe height
+        self.setAdHeight(height);
+      });
     }
     // Make iframe stretch to fill parent
     if (this.options.fillWidthOption) {
-      console.log("fill width switch ON");
+      this.iframe.style.width = "100%";
     }
   },
   getDocHeight : function() {
@@ -86,11 +93,13 @@ $ryotParent.prototype = {
     var lastOffset = getScrollTop();
     var lastDate = new Date().getTime();
     function wheel(e) {
-      $app.data.scrollTop = getScrollTop();
-      $app.data.childScrollTop = ($app.data.scrollTop-$app.data.topPosition<0 ? 0 : $app.data.scrollTop-$app.data.topPosition);
+      setData()
     }
-    $app.data.scrollTop = getScrollTop();
-    $app.data.childScrollTop = ($app.data.scrollTop-$app.data.topPosition<0 ? 0 : $app.data.scrollTop-$app.data.topPosition);
+    function setData() {
+      $app.data.scrollTop = getScrollTop();
+      $app.data.childScrollTop = ($app.data.scrollTop-$app.data.topPosition<0 ? 0 : $app.data.scrollTop-$app.data.topPosition);      
+    }
+    setData()
   },
   getWindowSize : function() {
     var w = window,
