@@ -151,7 +151,8 @@ $ryot.prototype.init = function() {
       clearInterval(delayedInit);
     }
     ++i;
-  }, this.options.checkSpeed);
+  }, 50);
+  // }, this.options.checkSpeed);
 };
 
 /*

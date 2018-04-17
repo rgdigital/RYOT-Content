@@ -1,9 +1,10 @@
 $ryot.Component.hoverParallax = function() {
-  this.options = this.parent.options;
+  
+  // this.options = this.parent.options;
   this.elements = this.getElements();
-  this.options = this.getOptions();
 
-  if (this.elements.wrapper.length > 0) {    
+  if (this.elements.wrapper !== undefined) {
+    this.options = this.getOptions();
     // Set hover parallax
     this.setParallax();
   }
@@ -14,7 +15,9 @@ $ryot.Component.hoverParallax.prototype.getElements = function() {
   var elements = {};
   elements.body = document.getElementsByTagName('body')[0];
   elements.wrapper = document.getElementsByClassName('ryot-hover-parallax')[0];
-  elements.layers = elements.wrapper.getElementsByClassName('ryot-layer');
+  if (elements.wrapper !== undefined) {
+    elements.layers = elements.wrapper.getElementsByClassName('ryot-layer');  
+  }
   return elements;
 };
 
@@ -25,6 +28,7 @@ $ryot.Component.hoverParallax.prototype.getOptions = function() {
   var wrapper = this.elements.wrapper;
 
   options.scale = wrapper.getAttribute('data-ryot-scale')==null ? false : wrapper.getAttribute('data-ryot-scale');
+  options.snapSpeed = wrapper.getAttribute('data-ryot-snapspeed')==null ? false : wrapper.getAttribute('data-ryot-snapspeed');
   
   return options;
 };
@@ -38,6 +42,7 @@ $ryot.Component.hoverParallax.prototype.setParallax = function() {
   var o = this.options;
 
   var scale = o.scale || 1;
+  var snapSpeed = o.snapSpeed || 0.4;
 
   function mouseOver() {
     TweenMax.to(photoWrapper, 1.5, {scale:1.2, ease:Power4.easeOut});
@@ -54,12 +59,12 @@ $ryot.Component.hoverParallax.prototype.setParallax = function() {
 
   parent.addEventListener('mouseover', function(e) {
     e.stopPropagation();
-    TweenMax.to(children, 0.4, {scale:(scale=='true' ? 1.1 : scale), x:0, y:0});
+    TweenMax.to(children, (!snapSpeed ? 0.4 : snapSpeed), {scale:(scale=='true' ? 1.1 : scale), x:0, y:0});
   });
 
   parent.addEventListener('mouseout', function(e) {
     e.stopPropagation();
-    TweenMax.to(children, 0.4, {scale:1, x:0, y:0});
+    TweenMax.to(children, (!snapSpeed ? 0.4 : snapSpeed), {scale:1, x:0, y:0});
   });
 
 };

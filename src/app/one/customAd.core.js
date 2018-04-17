@@ -104,6 +104,8 @@ customAd.prototype.handleParentData = function() {
   this.setAdHeight();
   // Setup resize event
   this.setupResize();
+  // Focus iframe
+  this.elem.adIframe.contentWindow.focus();
 };
 
 /**

@@ -66,6 +66,7 @@ $ryotParent.prototype = {
     if (this.options.fillWidthOption) {
       this.iframe.style.width = "100%";
     }
+    this.iframe.focus();
   },
   getDocHeight : function() {
     return this.childWindow.document.body.scrollHeight;
