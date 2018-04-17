@@ -71,9 +71,14 @@ body
 {
   padding: 20px 40px;
 }
+.ryot-abs
+{
+  position:absolute;
+}
 
 /* 
  * Components
  */
 @import "components/followscroll";
 @import "components/inview";
+@import "components/hoverparallax";
