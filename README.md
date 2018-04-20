@@ -9,7 +9,7 @@ These steps will install command line tools needed to isntall & run the project.
 - Type **terminal** and press enter.
 - Now you need to downgrade node to version 4 (Sass compiling doesn't work with recent versions of Node).
 
-⋅⋅⋅ Run these 3 commands (separately, one-by-one) to downgrade node:
+Run these 3 commands (separately, one-by-one) to downgrade node:
 ```
 sudo npm cache clean -f
 sudo npm install -g n
