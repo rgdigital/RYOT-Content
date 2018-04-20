@@ -37,7 +37,22 @@ Now you have all the tools needed to run a project from terminal.
 - To add CSS, edit the **style.scss** file in `public/style.scss`. These are sass files, but you can use normal CSS here too.
 - To add Javascript, edit the **run.js** file in `src/app/run.js`.
 
+## Body options
+
+Here are the options you can apply to the opening body tag:
+
+```html
+<body data-ryot-resize="true" data-ryot-fillwidth="true">
+```
+
+### API
+- `data-ryot-resize="true"` This will re-calculate the ads size when the browser window resizes.
+- `data-ryot-fillwidth="true"` This tells the ad to fill the wrapper it is placed in (which overrides ONE's default sizing).
+
 ## Parallax hover box 
+
+Adding layers to this component with the structure below will parallax animate the layers according to the mouse position.
+
 ```html
   <!-- Parallax component with 4 layers -->
   <div class="ryot-hover-parallax" data-ryot-scale="1.1" data-ryot-snapspeed="0.4" style="background:#000000;margin-top:20px;">
@@ -52,7 +67,10 @@ Now you have all the tools needed to run a project from terminal.
 - `data-ryot-scale="1.1"` How much layer items scale by on hover.
 - `data-ryot-snapspeed="0.4"` The speed at which the layers snap back in place on mouseout.
 
-## ryot-inview
+## Inview
+
+This component will get an active class (`.ryot-visible`) added to them once the user has scrolled them in view. Once they have been viewed a `.ryot-shown` class is also added permanently.
+
 ```html
   <div class="full-width row">
     <div class="col ryot-inview anim-fromleft">
@@ -76,6 +94,10 @@ Now you have all the tools needed to run a project from terminal.
   </div>
 ```
 
-### API
-- `data-ryot-scale="1.1"` How much layer items scale by on hover.
-- `data-ryot-snapspeed="0.4"` The speed at which the layers snap back in place on mouseout.
+## Followscroll
+
+This component will follow the pages scroll position as the user scrolls.
+
+```html
+<div class="ryot-followscroll">This element follows the scroll position on the page</div>
+```
