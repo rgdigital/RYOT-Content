@@ -1,5 +1,28 @@
 # RYOT Content Bootstrap
 
+## Setting up environment
+
+These steps will install command line tools needed to isntall & run the project.
+
+- Install [Node](https://nodejs.org/en/download/). This is used to install the project.
+- Now open terminal. <kbd>command</kbd> + <kbd>space</kbd> to open mac search bar.
+- Type **terminal** and press enter.
+- Now you need to downgrade node to version 4 (Sass compiling doesn't work with recent versions of Node).
+
+⋅⋅⋅ Run these 3 commands (separately, one-by-one) to downgrade node:
+```
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable
+```
+
+- Now you need to install gulp command line tools to run the project. In terminal, run this -
+```
+npm install --global gulp-cli
+```
+
+Now you have all the tools needed to run a project from terminal.
+
 ## Installing
 - Install Cisco AnyConnect. You need to connect to a VPN to access RYOT git repositories.
 - Download the [RYOT Content zip](https://git.ouroath.com/ryot-uk/RYOT-Content/archive/master.zip)
@@ -7,7 +30,7 @@
 - In terminal, go the folder you unzipped the package to using the `cd` function. Eg, `cd /path/to/folder`. You can drag a file to terminal to enter the path automatically.
 - Install the package with `sudo npm install`.
 - Run the content bootstrap with `gulp`.
-- A browser window should now pop up with the project.ryot-hover-parallax
+- A browser window should now pop up with the project.
 
 ## Developing
 - To add HTML, edit the **index.html** page from `src/index.html` (parent.html is used to preview the page locally). This page has examples of how to use the framework.

@@ -4,4 +4,7 @@ $ryot.ready(function() {
     checkSpeed : 5
   };
   $app = new $ryot(options);
-})
+
+  // console.log($app.components.inview);
+  
+});

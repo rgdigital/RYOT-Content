@@ -89,8 +89,8 @@ gulp.task('sass', function() {
 gulp.task('ryotcontent', function() {
   // Content bootstrap
   var ryot = gulp.src([
-      "src/app/core/core.js",
-      "src/app/core/*.js",
+      "src/app/ryot/ryot.core.js",
+      "src/app/ryot/*.js",
       "src/app/components/*.js",
       "src/app/run.js",
     ])
