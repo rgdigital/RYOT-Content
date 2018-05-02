@@ -13,10 +13,11 @@ $ryot.Component.followscroll.prototype.scrolling = function() {
   var self = this;
   var elems = this.elements;
   setInterval(function() {
+    // console.log(self.parent.data)
     for (var i = 0; i < elems.length; i++) {
       self.moveElem(elems[i]);
     }
-  }, this.options.checkSpeed);
+  }, 10);
 };
 
 $ryot.Component.followscroll.prototype.moveElem = function(elem) {
